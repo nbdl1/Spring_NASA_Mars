@@ -39,7 +39,7 @@ public class Controller {
         }
        System.out.println("maxSize is "+maxSize+" bytes");
        System.out.println("Picture URL : "+maxSizePictureUrl);
-       return ResponseEntity.ok().location(URI.create("https://mars.nasa.gov/msl-raw-images/proj/msl/redops/ods/surface/sol/00015/opgs/edr/ncam/NLA_398828349EDR_F0030004NCAM00504M_.JPG")).build();
+       return ResponseEntity.ok().location(URI.create(maxSizePictureUrl)).build();
     }
 
     private List<String> getListOfPictureURIs(int sol, String key) throws IOException {
@@ -55,7 +55,7 @@ public class Controller {
             System.out.println("Ooops, exception: "+e.getMessage());
         }
         if(json.length()>0){
-            Pattern getUrlsPattern = Pattern.compile("(?<=\\\"img_src\\\"\\:\\\").[^\\,]+\\.JPG");
+            Pattern getUrlsPattern = Pattern.compile("(?<=\\\"img_src\\\"\\:\\\").[^\\,]+\\.[a-zA-Z]+");
             Matcher getUrlsMatcher = getUrlsPattern.matcher(json);
             while(getUrlsMatcher.find()){
                 listOfPictureURIs.add(getUrlsMatcher.group());
