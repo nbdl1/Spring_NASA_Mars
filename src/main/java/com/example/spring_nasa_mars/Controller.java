@@ -1,10 +1,9 @@
 package com.example.spring_nasa_mars;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,13 +17,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RestController
-@RequestMapping//("http://127.0.0.1")
 public class Controller {
    public static final String BASE_NASA_PATH = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=";
    public static final String API_KEY = "ihP4z43MG4TNFAVpF28gmRXyRiF091CLKoJV5jfN";
 
    @GetMapping("/pictures/{sol}/largest")
-    public ResponseEntity<Void> getLargetstPicture(@PathVariable int sol) throws IOException {
+    public RedirectView getLargetstPicture(@PathVariable int sol) throws IOException {
         List<String> listOfPictureURIs = getListOfPictureURIs(sol,API_KEY);
         HashMap<String, Integer> picturesAndSizesMap = getPicturesAndSizesMap(listOfPictureURIs);
         int maxSize = 0;
@@ -37,15 +35,12 @@ public class Controller {
                 maxSizePictureUrl =entry.getKey();
             }
         }
-       System.out.println("maxSize is "+maxSize+" bytes");
-       System.out.println("Picture URL : "+maxSizePictureUrl);
-       return ResponseEntity.ok().location(URI.create(maxSizePictureUrl)).build();
+       return new RedirectView(maxSizePictureUrl);
     }
 
     private List<String> getListOfPictureURIs(int sol, String key) throws IOException {
         List<String> listOfPictureURIs = new ArrayList<>();
         String finalPathString = BASE_NASA_PATH+sol+"&api_key="+key;
-
         String json="";
         try(BufferedReader br = new BufferedReader(new InputStreamReader(new URL(finalPathString).openStream()));){
             while(br.ready()){
@@ -65,7 +60,7 @@ public class Controller {
     }
 
     private HashMap<String, Integer> getPicturesAndSizesMap(List<String> listOfPictureURIs) throws IOException {
-        HashMap<String, Integer> picturesAndSizesMap = new HashMap<>();
+       HashMap<String, Integer> picturesAndSizesMap = new HashMap<>();
         int pictureSize = 0;
         for(String pictureUrl: listOfPictureURIs){
             pictureSize = getPictureSize(pictureUrl);
@@ -75,7 +70,7 @@ public class Controller {
     }
 
     private int getPictureSize(String url) throws IOException {
-       HttpURLConnection  connectionToCurrentUrl = (HttpURLConnection )new URL(url).openConnection();
+        HttpURLConnection  connectionToCurrentUrl = (HttpURLConnection )new URL(url).openConnection();
        while (connectionToCurrentUrl.getResponseCode()<200||connectionToCurrentUrl.getResponseCode()>299){
            String location =  connectionToCurrentUrl.getHeaderField("Location");
            if(location!=null){

@@ -27,8 +27,8 @@ public class SpringNasaMarsApplication {
 
     public static void main(String[] args) throws IOException {
         SpringApplication.run(SpringNasaMarsApplication.class, args);
-        Controller ourController = new Controller();
-        ourController.getLargetstPicture(15);
+        //Controller ourController = new Controller();
+       //ourController.getLargetstPicture(15);
     }
 
 }
